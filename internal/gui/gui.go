@@ -2,10 +2,11 @@ package gui
 
 import (
 	"github.com/rivo/tview"
+	"github.com/tauraamui/dragoncli/internal/gui/views"
 )
 
 type view interface {
-	render() tview.Primitive
+	Render() tview.Primitive
 }
 
 type Gui struct {
@@ -17,11 +18,11 @@ type Gui struct {
 func NewGui() *Gui {
 	pages := tview.NewPages()
 	views := map[string]view{
-		"login": &loginView{},
+		"login": &views.Login{},
 	}
 
 	for viewName, viewRef := range views {
-		pages.AddPage(viewName, viewRef.render(), true, true)
+		pages.AddPage(viewName, viewRef.Render(), true, true)
 	}
 
 	app := tview.NewApplication()
