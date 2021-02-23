@@ -8,8 +8,9 @@ type Login struct {
 	password string
 }
 
-func (l *Login) updateUsername(username string) { l.username = username }
-func (l *Login) updatePassword(password string) { l.password = password }
+func (l Login) Name() string {
+	return "login"
+}
 
 func (l *Login) Render() tview.Primitive {
 	if l.rendered == nil {
@@ -17,6 +18,9 @@ func (l *Login) Render() tview.Primitive {
 	}
 	return l.rendered
 }
+
+func (l *Login) updateUsername(username string) { l.username = username }
+func (l *Login) updatePassword(password string) { l.password = password }
 
 func (l Login) getFormPrimative() tview.Primitive {
 	return tview.NewForm().

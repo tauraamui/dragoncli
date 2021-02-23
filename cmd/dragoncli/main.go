@@ -10,5 +10,7 @@ func main() {
 	// 	time.Sleep(time.Second * 3)
 	// 	app.Close()
 	// }()
+	app.Show(app.Login())
+	app.SetFocusToPages()
 	app.Run()
 }
