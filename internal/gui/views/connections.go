@@ -22,12 +22,16 @@ func (c Connections) Name() string {
 }
 
 func (c *Connections) Render() tview.Primitive {
-	_, err := c.fetchConnections()
+	connections, err := c.fetchConnections()
 	if err != nil {
 		logging.Error("Unable to fetch active connections: %v", err)
 	}
 	if c.rendered == nil {
-		c.rendered = tview.NewBox().SetBackgroundColor(tview.Styles.ContrastBackgroundColor)
+		list := tview.NewList()
+		for _, conn := range connections {
+			list.AddItem(conn.UUID, conn.Title, 'a', nil)
+		}
+		c.rendered = list
 	}
 	return c.rendered
 }

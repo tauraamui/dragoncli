@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"net/rpc"
 
 	"github.com/tacusci/logging/v2"
@@ -25,12 +26,12 @@ func (s Session) GetToken(args string, resp *string) error {
 type dragonClient struct {
 	app               *gui.Gui
 	client            *rpc.Client
-	rpcConnectionPort string
+	rpcConnectionAddr string
 	session           Session
 }
 
 func (d *dragonClient) Connect() error {
-	client, err := rpc.DialHTTP("tcp", d.rpcConnectionPort)
+	client, err := rpc.DialHTTP("tcp", d.rpcConnectionAddr)
 	if err != nil {
 		return err
 	}
@@ -82,9 +83,13 @@ func (d *dragonClient) Shutdown() (bool, error) {
 }
 
 func main() {
+	rpcConnectionAddrPtr := flag.String("rpcaddr", ":3121", "RPC server address")
+	flag.Parse()
+
 	dc := dragonClient{
-		rpcConnectionPort: ":3121",
+		rpcConnectionAddr: *rpcConnectionAddrPtr,
 	}
+
 	err := dc.Connect()
 	if err != nil {
 		logging.Fatal("Unable to connect to daemon: %v...", err)
