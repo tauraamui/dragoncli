@@ -48,7 +48,8 @@ func NewGui() *Gui {
 	}
 
 	gui.views = map[string]view{
-		"login": views.NewLogin(),
+		"login":       views.NewLogin(),
+		"connections": views.NewConnections(),
 	}
 
 	gui.SetRoot(gui.main, true).SetFocus(gui.main)
@@ -67,6 +68,10 @@ func (g *Gui) Show(v view) {
 // View accessors...
 func (g *Gui) Login() *views.Login {
 	return g.views["login"].(*views.Login)
+}
+
+func (g *Gui) Connections() *views.Connections {
+	return g.views["connections"].(*views.Connections)
 }
 
 func componentID(v view) string {

@@ -3,7 +3,7 @@ package main
 import (
 	"net/rpc"
 
-	"github.com/tacusci/logging/v2"
+	"github.com/tauraamui/dragoncli/internal/gui"
 )
 
 func init() {
@@ -36,6 +36,7 @@ func (c ConnectionData) GetTitle(args string, dst *string) error {
 }
 
 type dragonClient struct {
+	app               *gui.Gui
 	client            *rpc.Client
 	rpcConnectionPort string
 	session           Session
@@ -55,6 +56,7 @@ func (d *dragonClient) Authenticate(username, password string) {
 	// NOTE(tauraamui): obviously temp placeholder for real auth here
 	if username == "remoteadmin" && password == "12345" {
 		d.session.Token = "validtoken"
+		d.app.Show(d.app.Connections())
 	}
 }
 
@@ -93,38 +95,40 @@ func (d *dragonClient) Shutdown() (bool, error) {
 }
 
 func main() {
+	app := gui.NewGui()
+	// go func() {
+	// 	time.Sleep(time.Second * 3)
+	// 	app.Close()
+	// }()
 	dc := dragonClient{
+		app:               app,
 		rpcConnectionPort: ":3121",
 	}
 
-	err := dc.Connect()
-	if err != nil {
-		logging.Fatal("Unable to connect to dragon daemon: %v...", err)
-	}
+	app.Login().Callback(dc.Authenticate)
+	app.Show(app.Login())
+	app.SetFocusToPages()
 
-	conns, err := dc.ActiveConnections()
-	if err != nil {
-		logging.Fatal("Unable to fetch active connections: %v...", err)
-	}
+	// err := dc.Connect()
+	// if err != nil {
+	// 	logging.Fatal("Unable to connect to dragon daemon: %v...", err)
+	// }
 
-	if len(conns) > 0 {
-		logging.Info("REBOOTING CONNECTION: %v", conns[0])
-		_, err := dc.RebootConnection(conns[0].UUID)
+	// conns, err := dc.ActiveConnections()
+	// if err != nil {
+	// 	logging.Fatal("Unable to fetch active connections: %v...", err)
+	// }
 
-		if err != nil {
-			logging.Error("Unable to reboot connection of UUID %s: %v...", conns[0].UUID, err)
-		}
-	}
+	// if len(conns) > 0 {
+	// 	logging.Info("REBOOTING CONNECTION: %v", conns[0])
+	// 	_, err := dc.RebootConnection(conns[0].UUID)
+
+	// 	if err != nil {
+	// 		logging.Error("Unable to reboot connection of UUID %s: %v...", conns[0].UUID, err)
+	// 	}
+	// }
 
 	// dc.Shutdown()
 
-	// app := gui.NewGui()
-	// // go func() {
-	// // 	time.Sleep(time.Second * 3)
-	// // 	app.Close()
-	// // }()
-	// app.Login().Callback(dc.Authenticate)
-	// app.Show(app.Login())
-	// app.SetFocusToPages()
-	// app.Run()
+	app.Run()
 }

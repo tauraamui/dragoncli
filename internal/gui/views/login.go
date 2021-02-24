@@ -1,6 +1,8 @@
 package views
 
-import "github.com/rivo/tview"
+import (
+	"github.com/rivo/tview"
+)
 
 type Login struct {
 	rendered tview.Primitive
