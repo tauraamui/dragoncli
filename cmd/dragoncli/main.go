@@ -67,6 +67,16 @@ func (d *dragonClient) ActiveConnections() ([]ConnectionData, error) {
 	return conns, nil
 }
 
+func (d *dragonClient) Shutdown() (bool, error) {
+	ok := false
+	err := d.client.Call("MediaServer.Shutdown", &d.session, &ok)
+	if err != nil {
+		return false, err
+	}
+
+	return ok, nil
+}
+
 func main() {
 	dc := dragonClient{
 		rpcConnectionPort: ":3121",
@@ -85,6 +95,9 @@ func main() {
 	if len(conns) > 0 {
 		logging.Info("CONNECTION: %v", conns[0])
 	}
+
+	dc.Shutdown()
+
 	// app := gui.NewGui()
 	// // go func() {
 	// // 	time.Sleep(time.Second * 3)
