@@ -48,7 +48,7 @@ func NewGui() *Gui {
 	}
 
 	gui.views = map[string]view{
-		"login": &views.Login{},
+		"login": views.NewLogin(),
 	}
 
 	gui.SetRoot(gui.main, true).SetFocus(gui.main)
