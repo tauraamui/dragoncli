@@ -12,7 +12,8 @@ func init() {
 }
 
 type Session struct {
-	Token string
+	Token      string
+	CameraUUID string
 }
 
 func (s Session) GetToken(args string, resp *string) error {
@@ -67,6 +68,20 @@ func (d *dragonClient) ActiveConnections() ([]ConnectionData, error) {
 	return conns, nil
 }
 
+func (d *dragonClient) RebootConnection(cameraUUID string) (bool, error) {
+	ok := false
+	d.session.CameraUUID = cameraUUID
+	// ensure we don't accidentally leave this set no matter what
+	defer func() { d.session.CameraUUID = "" }()
+
+	err := d.client.Call("MediaServer.RebootConnection", &d.session, &ok)
+	if err != nil {
+		return false, err
+	}
+
+	return ok, nil
+}
+
 func (d *dragonClient) Shutdown() (bool, error) {
 	ok := false
 	err := d.client.Call("MediaServer.Shutdown", &d.session, &ok)
@@ -89,14 +104,19 @@ func main() {
 
 	conns, err := dc.ActiveConnections()
 	if err != nil {
-		logging.Fatal("Unable to fetch active connections: %v", err)
+		logging.Fatal("Unable to fetch active connections: %v...", err)
 	}
 
 	if len(conns) > 0 {
-		logging.Info("CONNECTION: %v", conns[0])
+		logging.Info("REBOOTING CONNECTION: %v", conns[0])
+		_, err := dc.RebootConnection(conns[0].UUID)
+
+		if err != nil {
+			logging.Error("Unable to reboot connection of UUID %s: %v...", conns[0].UUID, err)
+		}
 	}
 
-	dc.Shutdown()
+	// dc.Shutdown()
 
 	// app := gui.NewGui()
 	// // go func() {
