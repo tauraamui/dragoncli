@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rivo/tview"
+	"github.com/tauraamui/dragoncli/internal/common"
 	"github.com/tauraamui/dragoncli/internal/gui/views"
 )
 
@@ -41,7 +42,7 @@ type Gui struct {
 	views map[string]view
 }
 
-func NewGui() *Gui {
+func NewGui(fetchConnections func() ([]common.ConnectionData, error)) *Gui {
 	gui := Gui{
 		Application: tview.NewApplication(),
 		main:        NewPages(),
@@ -49,7 +50,7 @@ func NewGui() *Gui {
 
 	gui.views = map[string]view{
 		"login":       views.NewLogin(),
-		"connections": views.NewConnections(),
+		"connections": views.NewConnections(fetchConnections),
 	}
 
 	gui.SetRoot(gui.main, true).SetFocus(gui.main)

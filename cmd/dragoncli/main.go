@@ -3,12 +3,13 @@ package main
 import (
 	"net/rpc"
 
+	"github.com/tacusci/logging/v2"
+	"github.com/tauraamui/dragoncli/internal/common"
 	"github.com/tauraamui/dragoncli/internal/gui"
 )
 
 func init() {
 	rpc.Register(Session{})
-	rpc.Register(ConnectionData{})
 }
 
 type Session struct {
@@ -18,20 +19,6 @@ type Session struct {
 
 func (s Session) GetToken(args string, resp *string) error {
 	*resp = s.Token
-	return nil
-}
-
-type ConnectionData struct {
-	UUID, Title string
-}
-
-func (c ConnectionData) GetUUID(args string, dst *string) error {
-	*dst = c.UUID
-	return nil
-}
-
-func (c ConnectionData) GetTitle(args string, dst *string) error {
-	*dst = c.Title
 	return nil
 }
 
@@ -60,8 +47,8 @@ func (d *dragonClient) Authenticate(username, password string) {
 	}
 }
 
-func (d *dragonClient) ActiveConnections() ([]ConnectionData, error) {
-	conns := []ConnectionData{}
+func (d *dragonClient) ActiveConnections() ([]common.ConnectionData, error) {
+	conns := []common.ConnectionData{}
 	err := d.client.Call("MediaServer.ActiveConnections", &d.session, &conns)
 	if err != nil {
 		return nil, err
@@ -95,15 +82,16 @@ func (d *dragonClient) Shutdown() (bool, error) {
 }
 
 func main() {
-	app := gui.NewGui()
-	// go func() {
-	// 	time.Sleep(time.Second * 3)
-	// 	app.Close()
-	// }()
 	dc := dragonClient{
-		app:               app,
 		rpcConnectionPort: ":3121",
 	}
+	err := dc.Connect()
+	if err != nil {
+		logging.Fatal("Unable to connect to daemon: %v...", err)
+	}
+	app := gui.NewGui(dc.ActiveConnections)
+
+	dc.app = app
 
 	app.Login().Callback(dc.Authenticate)
 	app.Show(app.Login())
