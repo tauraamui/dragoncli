@@ -27,11 +27,44 @@ func (c *Connections) Render() tview.Primitive {
 		logging.Error("Unable to fetch active connections: %v", err)
 	}
 	if c.rendered == nil {
-		list := tview.NewList()
-		for _, conn := range connections {
-			list.AddItem(conn.UUID, conn.Title, 'a', nil)
+		// list := tview.NewList()
+		// for _, conn := range connections {
+		// 	list.AddItem(conn.UUID, conn.Title, 'a', nil)
+		// }
+		// c.rendered = list
+		rows := len(connections)
+		cols := 2
+		table := tview.NewTable()
+
+		table.SetCell(0, 0,
+			tview.NewTableCell("UUID").
+				SetAlign(tview.AlignCenter),
+		)
+
+		table.SetCell(0, 1,
+			tview.NewTableCell("TITLE").
+				SetAlign(tview.AlignCenter),
+		)
+
+		for r := 0; r < rows; r++ {
+			for c := 0; c < cols; c++ {
+				conn := connections[r]
+				if c == 0 {
+					table.SetCell(r+1, c,
+						tview.NewTableCell(conn.UUID).
+							SetAlign(tview.AlignCenter),
+					)
+				}
+
+				if c == 1 {
+					table.SetCell(r+1, c,
+						tview.NewTableCell(conn.Title).
+							SetAlign(tview.AlignCenter),
+					)
+				}
+			}
 		}
-		c.rendered = list
+		c.rendered = table
 	}
 	return c.rendered
 }
