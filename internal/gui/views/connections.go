@@ -40,8 +40,8 @@ func (c *Connections) Render() tview.Primitive {
 				SetAlign(tview.AlignCenter),
 		)
 
-		table.SetCell(0, 1,
-			tview.NewTableCell("SIZE").
+		table.SetCell(0, 2,
+			tview.NewTableCell("DISK SIZE").
 				SetAlign(tview.AlignCenter),
 		)
 
