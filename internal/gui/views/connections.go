@@ -33,7 +33,6 @@ func (c *Connections) Render() tview.Primitive {
 		// }
 		// c.rendered = list
 		rows := len(connections)
-		cols := 2
 		table := tview.NewTable()
 
 		table.SetCell(0, 0,
@@ -47,22 +46,16 @@ func (c *Connections) Render() tview.Primitive {
 		)
 
 		for r := 0; r < rows; r++ {
-			for c := 0; c < cols; c++ {
-				conn := connections[r]
-				if c == 0 {
-					table.SetCell(r+1, c,
-						tview.NewTableCell(conn.UUID).
-							SetAlign(tview.AlignCenter),
-					)
-				}
+			conn := connections[r]
+			table.SetCell(r+1, 0,
+				tview.NewTableCell(conn.UUID).
+					SetAlign(tview.AlignCenter),
+			)
 
-				if c == 1 {
-					table.SetCell(r+1, c,
-						tview.NewTableCell(conn.Title).
-							SetAlign(tview.AlignCenter),
-					)
-				}
-			}
+			table.SetCell(r+1, 1,
+				tview.NewTableCell(conn.Title).
+					SetAlign(tview.AlignCenter),
+			)
 		}
 		c.rendered = table
 	}
