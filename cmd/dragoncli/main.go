@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"net/rpc"
+	"os"
 
 	"github.com/tacusci/logging/v2"
 	"github.com/tauraamui/dragoncli/internal/common"
@@ -121,5 +122,5 @@ func mainRun() exitCode {
 }
 
 func main() {
-	mainRun()
+	os.Exit(int(mainRun()))
 }
