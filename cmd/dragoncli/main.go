@@ -82,7 +82,16 @@ func (d *dragonClient) Shutdown() (bool, error) {
 	return ok, nil
 }
 
-func main() {
+type exitCode int
+
+const (
+	exitOK     exitCode = 0
+	exitError  exitCode = 1
+	exitCancel exitCode = 2
+	exitAuth   exitCode = 4
+)
+
+func mainRun() exitCode {
 	rpcConnectionAddrPtr := flag.String("rpcaddr", ":3121", "RPC server address")
 	flag.Parse()
 
@@ -92,7 +101,8 @@ func main() {
 
 	err := dc.Connect()
 	if err != nil {
-		logging.Fatal("Unable to connect to daemon: %v...", err)
+		logging.Error("Unable to connect to daemon: %v...", err)
+		return exitError
 	}
 	app := gui.NewGui(dc.ActiveConnections)
 
@@ -102,26 +112,14 @@ func main() {
 	app.Show(app.Login())
 	app.SetFocusToPages()
 
-	// err := dc.Connect()
-	// if err != nil {
-	// 	logging.Fatal("Unable to connect to dragon daemon: %v...", err)
-	// }
+	if err := app.Run(); err != nil {
+		logging.Error("Error occurred during app execution: %v", err)
+		return exitError
+	}
 
-	// conns, err := dc.ActiveConnections()
-	// if err != nil {
-	// 	logging.Fatal("Unable to fetch active connections: %v...", err)
-	// }
+	return exitOK
+}
 
-	// if len(conns) > 0 {
-	// 	logging.Info("REBOOTING CONNECTION: %v", conns[0])
-	// 	_, err := dc.RebootConnection(conns[0].UUID)
-
-	// 	if err != nil {
-	// 		logging.Error("Unable to reboot connection of UUID %s: %v...", conns[0].UUID, err)
-	// 	}
-	// }
-
-	// dc.Shutdown()
-
-	app.Run()
+func main() {
+	mainRun()
 }
