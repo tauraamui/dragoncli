@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"net/rpc"
 	"os"
 
@@ -47,6 +48,9 @@ func (d *dragonClient) Authenticate(username, password string) {
 		d.session.Token = "validtoken"
 		d.app.Show(d.app.Connections())
 	}
+	usernameAndPassword := fmt.Sprintf("%s|%s", username, password)
+	authToken := ""
+	d.client.Call("MediaServer.Authenticate", &usernameAndPassword, &authToken)
 }
 
 func (d *dragonClient) ActiveConnections() ([]common.ConnectionData, error) {
