@@ -43,14 +43,13 @@ func (d *dragonClient) Connect() error {
 }
 
 func (d *dragonClient) Authenticate(username, password string) {
-	// NOTE(tauraamui): obviously temp placeholder for real auth here
-	if username == "remoteadmin" && password == "12345" {
-		d.session.Token = "validtoken"
-		d.app.Show(d.app.Connections())
-	}
 	usernameAndPassword := fmt.Sprintf("%s|%s", username, password)
 	authToken := ""
-	d.client.Call("MediaServer.Authenticate", &usernameAndPassword, &authToken)
+	err := d.client.Call("MediaServer.Authenticate", &usernameAndPassword, &authToken)
+	if err != nil {
+		logging.Error("Authentication failed: %v", err)
+	}
+	d.app.Show(d.app.Connections())
 }
 
 func (d *dragonClient) ActiveConnections() ([]common.ConnectionData, error) {
