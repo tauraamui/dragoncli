@@ -49,6 +49,7 @@ func (d *dragonClient) Authenticate(username, password string) {
 	if err != nil {
 		logging.Error("Authentication failed: %v", err)
 	}
+	d.session.Token = authToken
 	d.app.Show(d.app.Connections())
 }
 
