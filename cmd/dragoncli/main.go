@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"net/rpc"
 	"os"
 
@@ -43,9 +42,8 @@ func (d *dragonClient) Connect() error {
 }
 
 func (d *dragonClient) Authenticate(username, password string) {
-	usernameAndPassword := fmt.Sprintf("%s|%s", username, password)
 	authToken := ""
-	err := d.client.Call("MediaServer.Authenticate", &usernameAndPassword, &authToken)
+	err := d.client.Call("MediaServer.Authenticate", []string{username, password}, &authToken)
 	if err != nil {
 		logging.Error("Authentication failed: %v", err)
 	}
